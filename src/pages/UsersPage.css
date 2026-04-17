@@ -1,0 +1,308 @@
+.users-page .page-head,
+.companies-page .page-head,
+.reports-page .page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.page-head h1 {
+  font-size: 28px;
+  font-weight: 800;
+}
+.page-head p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  font-size: 14px;
+  width: 280px;
+  transition: border 0.2s;
+  background: var(--surface);
+  color: var(--text);
+}
+.search-input:focus {
+  border-color: #7b68ee;
+  outline: none;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 8px;
+}
+.chip {
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #ede9ff;
+  color: #7b68ee;
+  transition: all 0.15s;
+  cursor: pointer;
+  border: none;
+}
+.chip.active {
+  background: #7b68ee;
+  color: #fff;
+}
+
+.td-name {
+  font-weight: 700;
+}
+.td-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  transition: opacity 0.15s;
+  border: none;
+  cursor: pointer;
+}
+.action-btn.warn {
+  background: #fff8e1;
+  color: #f57c00;
+}
+.action-btn.info {
+  background: #e1f5fe;
+  color: #0288d1;
+}
+.action-btn.danger {
+  background: #ffebee;
+  color: #d32f2f;
+}
+.action-btn.edit {
+  background: #ede9ff;
+  color: #7b68ee;
+}
+.action-btn:hover {
+  opacity: 0.8;
+}
+
+.muted {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.setup-select,
+.setup-input,
+.setup-preset {
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--surface);
+  color: var(--text);
+  transition: border 0.2s;
+}
+.setup-select:focus,
+.setup-input:focus,
+.setup-preset:focus {
+  border-color: #7b68ee;
+  outline: none;
+}
+.setup-preset {
+  width: 58px;
+  font-weight: 700;
+}
+.setup-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 170px;
+}
+.setup-field .setup-input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Edit User Modal ─────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.modal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+}
+.modal-header h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.modal-close {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(123, 104, 238, 0.12);
+  border: 1px solid rgba(123, 104, 238, 0.18);
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0;
+  border-radius: 999px;
+  transition: all 0.15s;
+  line-height: 1;
+}
+.modal-close:hover {
+  background: rgba(123, 104, 238, 0.2);
+  color: var(--text);
+  border-color: rgba(123, 104, 238, 0.3);
+}
+
+.modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  background: var(--surface);
+}
+
+.modal-email {
+  font-size: 13px;
+  color: #7b68ee;
+  font-weight: 600;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: rgba(123, 104, 238, 0.12);
+  border-radius: 8px;
+  border: 1px solid rgba(123, 104, 238, 0.2);
+}
+
+.modal-section-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #7b68ee;
+  letter-spacing: 1.4px;
+  margin: 16px 0 10px;
+  text-transform: uppercase;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex: 1;
+}
+.modal-field label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.modal-field input,
+.modal-field select {
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg, #0f172a);
+  transition: border 0.2s;
+}
+.modal-field input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+.modal-field input:focus,
+.modal-field select:focus {
+  border-color: #7b68ee;
+  background: var(--surface);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(123, 104, 238, 0.15);
+}
+
+.modal-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.modal-row .modal-field {
+  flex: 1 1 160px;
+  min-width: 160px;
+}
+
+.modal-helper {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: rgba(123, 104, 238, 0.08);
+  border: 1px solid rgba(123, 104, 238, 0.2);
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-top: 4px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1.5px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: var(--surface);
+  border-radius: 0 0 20px 20px;
+}
+
+.btn-ghost {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-ghost:hover {
+  border-color: #7b68ee;
+  color: #7b68ee;
+}

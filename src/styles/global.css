@@ -1,0 +1,44 @@
+/* === Internly Web Admin — Global Styles === */
+:root {
+  --primary: #6366F1; /* Modern Indigo */
+  --primary-dark: #4F46E5;
+  --secondary: #818CF8;
+  --bg: #F8FAFC; /* Softer gray background */
+  --surface: #FFFFFF;
+  --text: #0F172A; /* Slate black para professional */
+  --text-secondary: #64748B;
+  --success: #10B981;
+  --error: #EF4444;
+  --warning: #F59E0B;
+  --border: #E2E8F0;
+  
+  --sidebar-w: 260px;
+  --header-h: 72px; /* Tumaas ng konti para spacious */
+  --radius: 16px; /* Smoother rounded corners */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+
+a { text-decoration: none; color: inherit; }
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  outline: none;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  outline: none;
+}

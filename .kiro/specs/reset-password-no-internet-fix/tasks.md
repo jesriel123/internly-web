@@ -1,0 +1,108 @@
+# Implementation Plan
+
+- [x] 1. Write bug condition exploration test
+  - **Property 1: Bug Condition** - Authentication Timeout Misreported as Network Error
+  - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate the bug exists
+  - **Scoped PBT Approach**: For deterministic bugs, scope the property to the concrete failing case(s) to ensure reproducibility
+  - Mock Supabase auth operations (signInWithPassword, resetPasswordForEmail, setSession) to delay 15 seconds
+  - Test that operations timeout after 12 seconds on UNFIXED code
+  - Test that timeout errors display "Network error" or "no internet" messages (incorrect behavior)
+  - Run test on UNFIXED code
+  - **EXPECTED OUTCOME**: Test FAILS (this is correct - it proves the bug exists)
+  - Document counterexamples found:
+    - Login with 15s delay shows "Network error. Please check your internet connection"
+    - Password reset request with 15s delay shows network-related error
+    - Reset link validation with 15s delay shows misleading network error
+  - Mark task complete when test is written, run, and failure is documented
+  - _Requirements: 1.1, 1.2, 1.3, 1.4_
+
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Existing Error Handling Unchanged
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for non-buggy inputs:
+    - Invalid credentials display "Incorrect email or password"
+    - Genuine network failures (device offline) display "Network error"
+    - Expired reset links display validation errors
+    - Successful fast operations (< 12s) complete and navigate correctly
+  - Write property-based tests capturing observed behavior patterns:
+    - Test invalid credentials error messages remain unchanged
+    - Test genuine network failure error messages remain unchanged
+    - Test expired/invalid reset link error messages remain unchanged
+    - Test successful authentication flows remain unchanged
+    - Test all existing Supabase error code mappings (auth/user-not-found, auth/wrong-password, auth/invalid-credential, auth/too-many-requests) remain unchanged
+  - Property-based testing generates many test cases for stronger guarantees
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - _Requirements: 3.1, 3.2, 3.3, 3.4_
+
+- [x] 3. Fix for authentication timeout misreported as network error
+
+  - [x] 3.1 Update AuthContext.js timeout and error handling
+    - Increase AUTH_TIMEOUT_MS from 12000 to 30000 (30 seconds)
+    - Modify timeoutError function to include code: 'auth/timeout' property
+    - Update login function catch block to check for 'auth/timeout' error code
+    - Display "Login timed out. Please check your connection and try again." for timeout errors
+    - Preserve existing error code mappings (auth/user-not-found, auth/wrong-password, auth/invalid-credential, auth/too-many-requests, auth/network-request-failed)
+    - Update forgotPassword function catch block to handle timeout errors
+    - Display appropriate timeout message instead of generic network error
+    - _Bug_Condition: isBugCondition(input) where input.operation IN ['login', 'forgotPassword'] AND input.networkAvailable == true AND input.duration >= 12000_
+    - _Expected_Behavior: Operations complete within 30s OR display accurate timeout message distinguishing from network failure_
+    - _Preservation: Existing error handling for genuine network failures, invalid credentials, and other error codes must remain unchanged_
+    - _Requirements: 2.1, 2.2, 2.4, 3.1, 3.2, 3.4_
+
+  - [x] 3.2 Update ResetPasswordScreen.js timeout and error handling
+    - Increase AUTH_TIMEOUT_MS from 12000 to 30000 (30 seconds)
+    - Modify timeoutError function to include code: 'auth/timeout' property
+    - Update bindRecoverySession catch block to detect timeout errors
+    - Display "Validation timed out. Please check your connection and try again." for timeout errors
+    - Update handleUpdatePassword catch block to handle timeout errors
+    - Display appropriate timeout message for password update timeouts
+    - Preserve existing error messages for invalid links, expired tokens, and other validation errors
+    - _Bug_Condition: isBugCondition(input) where input.operation IN ['verifyResetLink', 'resetPassword'] AND input.networkAvailable == true AND input.duration >= 12000_
+    - _Expected_Behavior: Operations complete within 30s OR display accurate timeout message distinguishing from network failure_
+    - _Preservation: Existing error handling for invalid/expired reset links and other error conditions must remain unchanged_
+    - _Requirements: 2.3, 2.4, 3.3_
+
+  - [x] 3.3 Update LoginScreen.js error handling
+    - Update handleLogin catch block to check for 'auth/timeout' error code
+    - Display "Login timed out. Please check your connection and try again." for timeout errors
+    - Preserve all existing error code mappings (auth/user-not-found, auth/wrong-password, auth/invalid-credential, auth/too-many-requests, auth/network-request-failed)
+    - Update submitForgotPassword catch block to handle timeout errors
+    - Display appropriate timeout message instead of generic network error
+    - Preserve existing error handling for other cases
+    - _Bug_Condition: isBugCondition(input) where input.operation IN ['login', 'forgotPassword'] AND input.networkAvailable == true AND input.duration >= 12000_
+    - _Expected_Behavior: Display accurate timeout message distinguishing from network failure_
+    - _Preservation: Existing error handling for invalid credentials and genuine network failures must remain unchanged_
+    - _Requirements: 2.1, 2.2, 2.4, 3.1, 3.2_
+
+  - [x] 3.4 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Authentication Timeout Displays Accurate Message
+    - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
+    - The test from task 1 encodes the expected behavior
+    - When this test passes, it confirms the expected behavior is satisfied
+    - Run bug condition exploration test from step 1
+    - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
+    - Verify that operations with 15s delay either:
+      - Complete successfully within 30s timeout, OR
+      - Display timeout message (not "network error" or "no internet")
+    - Verify timeout messages distinguish between timeout and connectivity failure
+    - _Requirements: 2.1, 2.2, 2.3, 2.4_
+
+  - [x] 3.5 Verify preservation tests still pass
+    - **Property 2: Preservation** - Existing Error Handling Unchanged
+    - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
+    - Run preservation property tests from step 2
+    - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
+    - Confirm all tests still pass after fix:
+      - Invalid credentials still display "Incorrect email or password"
+      - Genuine network failures still display "Network error"
+      - Expired reset links still display validation errors
+      - Successful fast operations still complete and navigate correctly
+      - All existing Supabase error code mappings unchanged
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

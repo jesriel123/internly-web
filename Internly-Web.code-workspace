@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Internly-Mobile"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Internly-Web"
+	}
+}

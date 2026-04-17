@@ -1,0 +1,69 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+.admin-wrapper {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* --- THE NEW MODERN HEADER --- */
+.admin-header {
+  height: var(--header-h);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px); /* Glassmorphism effect */
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.header-profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.hp-info {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.hp-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.hp-role {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.hp-avatar {
+  width: 40px;
+  height: 40px;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.hp-avatar.profile-picture {
+  font-size: 0;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 32px 40px;
+  overflow-y: auto;
+}

@@ -1,0 +1,23 @@
+.timelogs-page .page-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.timelogs-page .toolbar{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.company-select{padding:10px 16px;border-radius:10px;border:1.5px solid rgba(124,58,237,.35);font-size:14px;min-width:220px;transition:border .2s;background:rgba(15,23,42,.72);color:#E5E7EB}
+.company-select:focus{border-color:#7B68EE;outline:none}
+.student-search{padding:10px 16px;border-radius:10px;border:1.5px solid rgba(124,58,237,.25);font-size:14px;min-width:260px;transition:border .2s;background:rgba(15,23,42,.72);color:#E5E7EB}
+.student-search:focus{border-color:#7B68EE;outline:none}
+.student-search::placeholder{color:#9CA3AF;opacity:.9}
+.student-search:disabled{background:rgba(15,23,42,.45);color:#9CA3AF;cursor:not-allowed}
+.company-summary{display:flex;align-items:center;padding:9px 12px;border-radius:10px;background:rgba(124,58,237,.14);border:1px solid rgba(124,58,237,.35);font-size:13px;font-weight:700;color:#C4B5FD}
+.badge.status-approved{background:#E8F5E9;color:#2E7D32}
+.badge.status-pending{background:#FFF8E1;color:#F57C00}
+.badge.status-rejected{background:#FFEBEE;color:#D32F2F}
+.badge.status-flagged{background:#FFF3E0;color:#E65100}
+
+.action-btn.approve-present{background:#EDE9FE;color:#7C3AED;border:none;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
+.action-btn.approve-ot{background:#D1FAE5;color:#059669;border:none;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
+.action-btn.approve-early{background:#DBEAFE;color:#2563EB;border:none;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
+.action-btn.approve-half{background:#FEF3C7;color:#D97706;border:none;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
+.action-btn.approve-present:hover{background:#DDD6FE}
+.action-btn.approve-ot:hover{background:#A7F3D0}
+.action-btn.approve-early:hover{background:#BFDBFE}
+.action-btn.approve-half:hover{background:#FDE68A}
+.td-actions{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
