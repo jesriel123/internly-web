@@ -36,11 +36,6 @@ export default function TimeLogsPage() {
   const [loading, setLoading] = useState(true);
   const [logsLoading, setLogsLoading] = useState(false);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    fetchStudents();
-  }, []);
-
   const normalizeStudent = (row) => {
     const role = String(row?.role || "user").toLowerCase();
     if (role === "admin" || role === "super_admin") return null;
@@ -70,7 +65,7 @@ export default function TimeLogsPage() {
     };
   };
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     setLoading(true);
     try {
       const { data: list, error } = await supabase
@@ -137,7 +132,11 @@ export default function TimeLogsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
 
   const fetchCompanyLogs = useCallback(
     async (companyName) => {

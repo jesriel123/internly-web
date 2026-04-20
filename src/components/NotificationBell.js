@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../supabaseConfig';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -14,48 +14,7 @@ export default function NotificationBell() {
   const [loading, setLoading] = useState(false);
   const panelRef = useRef(null);
 
-  useEffect(() => {
-    if (user?.uid) {
-      fetchNotifications();
-      
-      // Subscribe to realtime updates
-      const channel = supabase
-        .channel('notification-updates')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'notification_logs',
-            filter: `recipient_id=eq.${user.uid}`,
-          },
-          () => {
-            fetchNotifications();
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [user?.uid]);
-
-  // Close panel when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (panelRef.current && !panelRef.current.contains(event.target)) {
-        setShowPanel(false);
-      }
-    }
-
-    if (showPanel) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [showPanel]);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!user?.uid) return;
     
     setLoading(true);
@@ -105,7 +64,48 @@ export default function NotificationBell() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.uid]);
+
+  useEffect(() => {
+    if (user?.uid) {
+      fetchNotifications();
+      
+      // Subscribe to realtime updates
+      const channel = supabase
+        .channel('notification-updates')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'notification_logs',
+            filter: `recipient_id=eq.${user.uid}`,
+          },
+          () => {
+            fetchNotifications();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user?.uid, fetchNotifications]);
+
+  // Close panel when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (panelRef.current && !panelRef.current.contains(event.target)) {
+        setShowPanel(false);
+      }
+    }
+
+    if (showPanel) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showPanel]);
 
   const markAsRead = async (notificationLogId) => {
     try {
