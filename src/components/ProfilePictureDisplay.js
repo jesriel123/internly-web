@@ -16,6 +16,17 @@ export default function ProfilePictureDisplay({
   size = 40,
   className = '',
 }) {
+  const sizeMap = {
+    small: 32,
+    medium: 40,
+    large: 96,
+  };
+
+  const normalizedSize =
+    typeof size === 'number'
+      ? size
+      : sizeMap[String(size || '').toLowerCase()] || 40;
+
   const getInitials = () => {
     if (name) {
       const parts = name.trim().split(' ');
@@ -36,7 +47,7 @@ export default function ProfilePictureDisplay({
     return (
       <div
         className={`profile-picture ${className}`}
-        style={{ width: size, height: size }}
+        style={{ width: normalizedSize, height: normalizedSize }}
       >
         <img
           src={profilePictureUrl}
@@ -58,7 +69,7 @@ export default function ProfilePictureDisplay({
   return (
     <div
       className={`profile-picture ${className}`}
-      style={{ width: size, height: size }}
+      style={{ width: normalizedSize, height: normalizedSize }}
     >
       <div className="profile-picture-fallback">{initials}</div>
     </div>

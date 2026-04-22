@@ -62,15 +62,36 @@ export default function UsersPage() {
   const [saving, setSaving] = useState(false);
   const presetIntentRef = useRef({});
 
-  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => {
+    if (!me?.role) return;
+    fetchUsers();
+  }, [me?.role, me?.company]);
 
   const fetchUsers = async () => {
     const start = logRequestStart('FETCH_ALL_USERS');
     setLoading(true);
     try {
+      const isSuperAdmin = me?.role === 'super_admin';
+      const adminCompany = String(me?.company || '').trim();
+
+      let usersQuery = supabase.from('users').select('*').limit(200);
+      let companiesQuery = supabase.from('companies').select('name,address').limit(200);
+
+      if (!isSuperAdmin) {
+        if (!adminCompany) {
+          setUsers([]);
+          setCompanies([]);
+          setSetupDrafts({});
+          setLoading(false);
+          return;
+        }
+        usersQuery = usersQuery.eq('company', adminCompany);
+        companiesQuery = companiesQuery.eq('name', adminCompany);
+      }
+
       const [{ data: usersData, error: usersError }, { data: companiesData, error: companiesError }] = await Promise.all([
-        supabase.from('users').select('*').limit(200),
-        supabase.from('companies').select('name,address').limit(200),
+        usersQuery,
+        companiesQuery,
       ]);
       if (usersError) throw usersError;
       if (companiesError) throw companiesError;

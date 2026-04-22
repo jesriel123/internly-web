@@ -31,15 +31,35 @@ export default function CompaniesPage() {
   const [adminForm, setAdminForm] = useState(getEmptyAdminForm());
   const [assigningAdmin, setAssigningAdmin] = useState(false);
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => {
+    if (!me?.role) return;
+    fetchAll();
+  }, [me?.role, me?.company]);
 
   const fetchAll = async () => {
     const start = logRequestStart('COMPANIES_FETCH');
     setLoading(true);
     try {
+      const isSuperAdmin = me?.role === 'super_admin';
+      const adminCompany = String(me?.company || '').trim();
+
+      let companiesQuery = supabase.from('companies').select('*').limit(100);
+      let usersQuery = supabase.from('users').select('*').limit(200);
+
+      if (!isSuperAdmin) {
+        if (!adminCompany) {
+          setCompanies([]);
+          setUsers([]);
+          setLoading(false);
+          return;
+        }
+        companiesQuery = companiesQuery.eq('name', adminCompany);
+        usersQuery = usersQuery.eq('company', adminCompany);
+      }
+
       const [{ data: companies, error: compError }, { data: users, error: usersError }] = await Promise.all([
-        supabase.from('companies').select('*').limit(100),
-        supabase.from('users').select('*').limit(200),
+        companiesQuery,
+        usersQuery,
       ]);
       if (compError) throw compError;
       if (usersError) throw usersError;

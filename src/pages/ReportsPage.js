@@ -1,20 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseConfig';
+import { useAuth } from '../context/AuthContext';
 import './ReportsPage.css';
 
 export default function ReportsPage() {
+  const { user: me } = useAuth();
+  const isSuperAdmin = me?.role === 'super_admin';
   const [internData, setInternData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    if (!me?.role) return;
+    fetchData();
+  }, [me?.role, me?.company]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const { data: users, error: usersError } = await supabase.from('users').select('*').limit(200);
+      const adminCompany = String(me?.company || '').trim();
+      let usersQuery = supabase.from('users').select('*').limit(200);
+      if (!isSuperAdmin) {
+        if (!adminCompany) {
+          setInternData([]);
+          setLoading(false);
+          return;
+        }
+        usersQuery = usersQuery.eq('company', adminCompany);
+      }
+
+      const { data: users, error: usersError } = await usersQuery;
       if (usersError) throw usersError;
       const interns = (users || []).filter(u => u.role === 'user' || !u.role);
 

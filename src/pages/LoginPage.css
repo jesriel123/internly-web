@@ -14,14 +14,29 @@ body, html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Keep login page readable even when app-level dark mode class is active */
+/* Apply true dark styling when app-level dark mode is active */
 .dark-mode .login-container {
-  --bg-left: #ffffff;
-  --bg-right: #f3f5fb;
-  --text-dark: #1e1b4b;
-  --text-gray: #5f6b7f;
-  --border-light: #d9dfeb;
+  --bg-left: #0e172a;
+  --bg-right: #111a2f;
+  --text-dark: #e2e8f0;
+  --text-gray: #94a3b8;
+  --border-light: #334155;
   color: var(--text-dark);
+  background: linear-gradient(120deg, #0b1324 0%, #121f36 100%);
+}
+
+.dark-mode .login-left {
+  background: radial-gradient(circle at 10% 15%, #1e293b 0%, var(--bg-left) 45%), var(--bg-left);
+}
+
+.dark-mode .login-right {
+  background: linear-gradient(160deg, #111b30 0%, #0f1a2e 100%);
+}
+
+.dark-mode .login-form-wrapper {
+  background: #162338;
+  border-color: #2b3b55;
+  box-shadow: 0 20px 40px rgba(2, 6, 23, 0.5);
 }
 
 .dark-mode .login-container h1,
@@ -37,15 +52,59 @@ body, html {
   color: var(--text-gray);
 }
 
-.dark-mode .login-container .input-wrapper input {
-  background-color: #ffffff;
-  color: var(--text-dark);
-  border-color: var(--border-light);
+.dark-mode .secure-badge {
+  background-color: rgba(92, 89, 232, 0.18);
+  color: #a5b4fc;
 }
 
-.dark-mode .login-container .input-wrapper input::placeholder {
-  color: #64748b;
+.dark-mode .feature-icon {
+  background-color: #1f2a40;
+}
+
+.dark-mode .role-info-card {
+  background: linear-gradient(135deg, #1a2740 0%, #162338 100%);
+  border-color: #2f4161;
+}
+
+.dark-mode .role-info-content h4 {
+  color: #e2e8f0;
+}
+
+.dark-mode .role-info-content p {
+  color: #9fb0c8;
+}
+
+.dark-mode .input-icon,
+.dark-mode .pwd-toggle {
+  color: #8ea0bb;
+}
+
+.dark-mode .input-wrapper input {
+  background-color: #0f1b2f;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+.dark-mode .input-wrapper input::placeholder {
+  color: #7f91ad;
   opacity: 1;
+}
+
+.dark-mode .checkmark {
+  background-color: #0f1b2f;
+  border-color: #3a4b67;
+}
+
+.dark-mode .login-error {
+  background: #3b1320;
+  color: #fecaca;
+  border-color: #7f1d1d;
+}
+
+.dark-mode .login-info {
+  background: #0f2a24;
+  color: #a7f3d0;
+  border-color: #14532d;
 }
 
 .login-container {
@@ -86,6 +145,15 @@ body, html {
   align-items: center;
   justify-content: center;
   font-size: 24px;
+}
+
+.logo-image {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  background-color: #ffffff;
 }
 
 .brand-logo h2 {
@@ -527,6 +595,10 @@ body, html {
   .login-right {
     padding: 24px;
     background: #f6f7fc;
+  }
+
+  .dark-mode .login-right {
+    background: #0f1a2e;
   }
   
   .login-form-wrapper {

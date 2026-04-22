@@ -22,21 +22,47 @@ export default function NotificationsPage() {
   });
 
   useEffect(() => {
+    if (!me?.role) return;
     fetchData();
-  }, []);
+    setForm(prev => ({
+      ...prev,
+      targetScope: me?.role === 'super_admin' ? 'all' : 'my-company',
+      targetCompany: me?.company || '',
+    }));
+  }, [me?.role, me?.company]);
 
   const fetchData = async () => {
     const start = logRequestStart('NOTIF_FETCH');
     setLoading(true);
     try {
+      const isSuperAdmin = me?.role === 'super_admin';
+      const adminCompany = String(me?.company || '').trim();
+
+      let companiesQuery = supabase.from('companies').select('name').limit(100);
+      let usersQuery = supabase.from('users').select('*').limit(200);
+      let notificationsQuery = supabase
+        .from('notifications')
+        .select('*, sender:sender_id(name, email, company)')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (!isSuperAdmin) {
+        if (!adminCompany) {
+          setCompanies([]);
+          setUsers([]);
+          setNotifications([]);
+          setLoading(false);
+          return;
+        }
+        companiesQuery = companiesQuery.eq('name', adminCompany);
+        usersQuery = usersQuery.eq('company', adminCompany);
+        notificationsQuery = notificationsQuery.or(`target_company.eq.${adminCompany},is_global.eq.true,sender_id.eq.${me.uid}`);
+      }
+
       const [{ data: companyList }, { data: userList }, { data: notifList }] = await Promise.all([
-        supabase.from('companies').select('name').limit(100),
-        supabase.from('users').select('*').limit(200),
-        supabase
-          .from('notifications')
-          .select('*, sender:sender_id(name, email, company)')
-          .order('created_at', { ascending: false })
-          .limit(50),
+        companiesQuery,
+        usersQuery,
+        notificationsQuery,
       ]);
 
       setCompanies(companyList || []);

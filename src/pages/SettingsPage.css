@@ -186,6 +186,12 @@
 .profile-picture-preview-container {
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-height: 220px;
+  border: 1px dashed #d1d5db;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #fafbff 0%, #f3f5fb 100%);
+  padding: 24px;
 }
 
 .profile-picture-current {
@@ -193,15 +199,16 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  width: 100%;
 }
 
 .preview-img {
-  width: 120px;
-  height: 120px;
+  width: 132px;
+  height: 132px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #7b68ee;
-  box-shadow: 0 4px 12px rgba(123, 104, 238, 0.2);
+  border: 4px solid #7b68ee;
+  box-shadow: 0 8px 20px rgba(123, 104, 238, 0.28);
 }
 
 .current-label,
@@ -221,6 +228,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  justify-content: center;
 }
 
 .upload-input-wrapper {
@@ -337,6 +345,28 @@
   margin: 0;
 }
 
+.dark-mode .profile-picture-preview-container {
+  border-color: #334155;
+  background: linear-gradient(145deg, #18243a 0%, #111b2f 100%);
+}
+
+.dark-mode .current-label {
+  color: #94a3b8;
+}
+
+.dark-mode .upload-hint {
+  color: #94a3b8;
+}
+
+.dark-mode .btn-secondary {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.dark-mode .btn-secondary:hover {
+  background: #3f4f67;
+}
+
 .error-msg {
   background: #fee2e2;
   color: #dc2626;
@@ -352,6 +382,11 @@
   .profile-picture-section {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+
+  .profile-picture-preview-container {
+    min-height: 180px;
+    padding: 16px;
   }
 
   .preview-actions {

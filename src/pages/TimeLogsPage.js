@@ -68,10 +68,24 @@ export default function TimeLogsPage() {
   const fetchStudents = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: list, error } = await supabase
+      const isSuperAdmin = me?.role === "super_admin";
+      const adminCompany = String(me?.company || "").trim();
+
+      let usersQuery = supabase
         .from("users")
         .select("*")
         .limit(500);
+
+      if (!isSuperAdmin) {
+        if (!adminCompany) {
+          setStudents([]);
+          setLoading(false);
+          return;
+        }
+        usersQuery = usersQuery.eq("company", adminCompany);
+      }
+
+      const { data: list, error } = await usersQuery;
       if (error) throw error;
 
       const fromUsers = (list || [])
@@ -132,16 +146,31 @@ export default function TimeLogsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [me?.role, me?.company]);
 
   useEffect(() => {
+    if (!me?.role) return;
     fetchStudents();
-  }, [fetchStudents]);
+  }, [fetchStudents, me?.role, me?.company]);
+
+  useEffect(() => {
+    if (me?.role === "admin" && me?.company) {
+      setSelectedCompany(String(me.company).trim());
+    }
+  }, [me?.role, me?.company]);
 
   const fetchCompanyLogs = useCallback(
     async (companyName) => {
       const normalizedCompany = String(companyName || "").trim();
       if (!normalizedCompany) {
+        setLogs([]);
+        return;
+      }
+
+      if (
+        me?.role === "admin" &&
+        normalizedCompany !== String(me?.company || "").trim()
+      ) {
         setLogs([]);
         return;
       }
@@ -192,7 +221,7 @@ export default function TimeLogsPage() {
         setLogsLoading(false);
       }
     },
-    [students],
+    [students, me?.role, me?.company],
   );
 
   const handleCompanyChange = (companyName) => {

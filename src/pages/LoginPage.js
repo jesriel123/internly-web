@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { logButtonClick, logRequestStart, logRequestSuccess, logRequestFailure, logNetworkStatus } from '../utils/debugLogger';
-import { Mail, Lock, Eye, EyeOff, Shield, Calendar, CheckSquare, Users, GraduationCap } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield, Calendar, CheckSquare, Users } from 'lucide-react';
 import './LoginPage.css';
+
+const TITAN_LOGO_URL = '/titan-logo.png';
 
 const PASSWORD_RESET_PROD_URL = 'https://internly-web.vercel.app/reset-password';
 
@@ -102,8 +104,8 @@ export default function LoginPage() {
       <div className="login-left">
         <div className="left-content">
           <div className="brand-logo">
-            <div className="logo-icon"><GraduationCap size={24} color="#FFFFFF" /></div>
-            <h2>Internly</h2>
+            <img src={TITAN_LOGO_URL} alt="Titan logo" className="logo-image" />
+            <h2>Titan</h2>
           </div>
           
           <h1 className="hero-text">
