@@ -20,22 +20,28 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
+  padding: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: #f8fafc;
 }
 
 .search-input {
-  padding: 10px 16px;
+  padding: 10px 14px;
   border-radius: 10px;
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border-color);
   font-size: 14px;
   width: 280px;
-  transition: border 0.2s;
-  background: var(--surface);
-  color: var(--text);
+  min-height: 38px;
+  transition: border 0.2s, box-shadow 0.2s;
+  background: #ffffff;
+  color: var(--text-primary);
 }
 .search-input:focus {
-  border-color: #7b68ee;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
   outline: none;
 }
 
@@ -44,19 +50,20 @@
   gap: 8px;
 }
 .chip {
-  padding: 7px 16px;
+  padding: 8px 14px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 700;
-  background: #ede9ff;
-  color: #7b68ee;
-  transition: all 0.15s;
+  border: 1px solid rgba(99, 102, 241, 0.22);
+  background: rgba(99, 102, 241, 0.08);
+  color: #4f46e5;
+  transition: all 0.2s ease;
   cursor: pointer;
-  border: none;
 }
 .chip.active {
-  background: #7b68ee;
-  color: #fff;
+  background: rgba(99, 102, 241, 0.18);
+  color: #312e81;
+  border-color: rgba(99, 102, 241, 0.3);
 }
 
 .td-name {
@@ -246,7 +253,7 @@
   border-radius: 10px;
   font-size: 14px;
   color: var(--text);
-  background: var(--bg, #0f172a);
+  background: var(--surface);
   transition: border 0.2s;
 }
 .modal-field input::placeholder {
@@ -305,4 +312,242 @@
 .btn-ghost:hover {
   border-color: #7b68ee;
   color: #7b68ee;
+}
+
+/* Users table visual refresh */
+.users-page .table-card {
+  position: relative;
+  padding: 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+}
+
+.users-page .table-card table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.users-page .table-card thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--border-color);
+  background: #f8fafc;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+.users-page .table-card tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.users-page .table-card tbody tr:nth-child(even) {
+  background: transparent;
+}
+
+.users-page .table-card tbody tr:hover {
+  background: #eef2ff;
+}
+
+.users-page .table-card td {
+  padding: 11px 10px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+  color: #334155;
+  font-size: 13px;
+}
+
+.users-page .td-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.users-page .td-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.users-page .action-btn {
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: #f8fafc;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.users-page .action-btn.edit {
+  background: #ede9ff;
+  border-color: #c4b5fd;
+  color: #5b21b6;
+}
+
+.users-page .action-btn.warn {
+  background: #fff8e1;
+  border-color: #facc15;
+  color: #b45309;
+}
+
+.users-page .action-btn.info {
+  background: #e1f5fe;
+  border-color: #7dd3fc;
+  color: #0369a1;
+}
+
+.users-page .action-btn.danger {
+  background: #ffebee;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.users-page .action-btn:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(2, 8, 20, 0.25);
+}
+
+.users-page .setup-field {
+  min-width: 182px;
+  gap: 8px;
+}
+
+.users-page .setup-input,
+.users-page .setup-preset {
+  min-height: 32px;
+  border-width: 1px;
+  border-radius: 8px;
+  border-color: var(--border-color);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.dark-mode .users-page .toolbar {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.84), rgba(15, 23, 42, 0.72));
+}
+
+.dark-mode .users-page .search-input {
+  background: rgba(15, 23, 42, 0.65);
+}
+
+.dark-mode .users-page .chip {
+  border-color: rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.14);
+  color: #c7d2fe;
+}
+
+.dark-mode .users-page .chip.active {
+  background: rgba(99, 102, 241, 0.34);
+  color: #e0e7ff;
+  border-color: rgba(99, 102, 241, 0.55);
+}
+
+.dark-mode .users-page .table-card {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.92));
+  box-shadow: 0 18px 34px rgba(2, 8, 20, 0.24);
+}
+
+.dark-mode .users-page .table-card thead th {
+  background: rgba(15, 23, 42, 0.7);
+  color: #93c5fd;
+}
+
+.dark-mode .users-page .table-card tbody tr:hover {
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.dark-mode .users-page .table-card td {
+  border-bottom: 1px solid rgba(51, 65, 85, 0.85);
+  color: #e2e8f0;
+}
+
+.dark-mode .users-page .td-name {
+  color: #f8fafc;
+}
+
+.dark-mode .users-page .action-btn {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--text-primary);
+}
+
+.dark-mode .users-page .action-btn.edit {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.45);
+  color: #dbeafe;
+}
+
+.dark-mode .users-page .action-btn.warn {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+
+.dark-mode .users-page .action-btn.info {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #7dd3fc;
+}
+
+.dark-mode .users-page .action-btn.danger {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fda4af;
+}
+
+.dark-mode .users-page .setup-input,
+.dark-mode .users-page .setup-preset {
+  background: rgba(15, 23, 42, 0.65);
+  color: #e2e8f0;
+}
+
+.users-page .setup-input {
+  padding-inline: 10px;
+  font-weight: 700;
+}
+
+.users-page .setup-preset {
+  width: 44px;
+  padding-inline: 6px;
+  text-align: center;
+}
+
+@media (max-width: 1200px) {
+  .users-page .table-card {
+    padding: 12px;
+  }
+
+  .users-page .table-card table {
+    min-width: 920px;
+  }
+}
+
+@media (max-width: 760px) {
+  .users-page .td-actions {
+    gap: 6px;
+  }
+
+  .users-page .action-btn {
+    min-height: 28px;
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .users-page .setup-field {
+    min-width: 160px;
+    gap: 6px;
+  }
 }

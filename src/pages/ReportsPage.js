@@ -1,22 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../supabaseConfig';
 import { useAuth } from '../context/AuthContext';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import './ReportsPage.css';
 
 export default function ReportsPage() {
   const { user: me } = useAuth();
   const isSuperAdmin = me?.role === 'super_admin';
+  const hasRole = Boolean(me?.role);
   const [internData, setInternData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
-  useEffect(() => {
-    if (!me?.role) return;
-    fetchData();
-  }, [me?.role, me?.company]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const adminCompany = String(me?.company || '').trim();
@@ -55,7 +53,12 @@ export default function ReportsPage() {
       setInternData(data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  };
+  }, [me?.company, isSuperAdmin]);
+
+  useEffect(() => {
+    if (!hasRole) return;
+    fetchData();
+  }, [fetchData, hasRole]);
 
   // Filter by date range
   const filteredData = internData.map(u => {
@@ -92,15 +95,50 @@ export default function ReportsPage() {
   };
 
   const exportPDF = () => {
-    // Simple printable HTML report
-    const rows = filteredData.map(u =>
-      `<tr><td>${u.name || '—'}</td><td>${u.email}</td><td>${u.company || '—'}</td><td>${u.required}</td><td>${u.rendered.toFixed(2)}</td><td>${u.remaining.toFixed(2)}</td><td>${u.progress.toFixed(1)}%</td></tr>`
-    ).join('');
-    const html = `<html><head><title>Internly OJT Report</title><style>body{font-family:sans-serif;padding:20px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#7B68EE;color:white;font-size:12px}</style></head><body><h1>Internly OJT Hours Report</h1><p>Generated: ${new Date().toLocaleString()}</p><table><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Required</th><th>Rendered</th><th>Remaining</th><th>Progress</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
-    const w = window.open('', '_blank');
-    w.document.write(html);
-    w.document.close();
-    w.print();
+    if (filteredData.length === 0) {
+      alert('No data to export.');
+      return;
+    }
+
+    try {
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+      const generatedAt = new Date().toLocaleString();
+      const periodText = `${dateFrom || 'Start'} to ${dateTo || 'End'}`;
+
+      doc.setFontSize(16);
+      doc.text('Internly OJT Hours Report', 40, 36);
+      doc.setFontSize(10);
+      doc.setTextColor(80);
+      doc.text(`Generated: ${generatedAt}`, 40, 54);
+      doc.text(`Period: ${periodText}`, 40, 68);
+      doc.text(`Interns: ${filteredData.length} | Companies: ${companies.length} | Total Rendered: ${totalRendered.toFixed(1)} hrs`, 40, 82);
+
+      const tableBody = filteredData.map((u, i) => [
+        i + 1,
+        u.name || '—',
+        u.email || '—',
+        u.company || '—',
+        u.required,
+        u.rendered.toFixed(2),
+        u.remaining.toFixed(2),
+        `${u.progress.toFixed(1)}%`,
+      ]);
+
+      autoTable(doc, {
+        startY: 96,
+        head: [['#', 'Name', 'Email', 'Company', 'Required', 'Rendered', 'Remaining', 'Progress']],
+        body: tableBody,
+        styles: { fontSize: 9, cellPadding: 6 },
+        headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255] },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+        margin: { left: 40, right: 40 },
+      });
+
+      doc.save(`internly-ojt-report-${new Date().toISOString().slice(0, 10)}.pdf`);
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      alert('Failed to export PDF. Please try again.');
+    }
   };
 
   return (
@@ -110,7 +148,7 @@ export default function ReportsPage() {
           <h1>Reports & Exports</h1>
           <p>OJT hours reports with date filtering</p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className="report-actions">
           <button className="btn-primary" onClick={fetchData} disabled={loading}>Refresh</button>
           <button className="btn-export" onClick={exportCSV}>📥 CSV</button>
           <button className="btn-export" onClick={exportPDF}>🖨 PDF</button>
@@ -118,12 +156,12 @@ export default function ReportsPage() {
       </div>
 
       {/* Date filters */}
-      <div className="toolbar" style={{ marginBottom: 20 }}>
-        <label style={{ fontSize: 13, fontWeight: 600 }}>From:</label>
-        <input type="date" className="search-input" style={{ width: 160 }} value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
-        <label style={{ fontSize: 13, fontWeight: 600 }}>To:</label>
-        <input type="date" className="search-input" style={{ width: 160 }} value={dateTo} onChange={e => setDateTo(e.target.value)} />
-        {(dateFrom || dateTo) && <button className="chip active" onClick={() => { setDateFrom(''); setDateTo(''); }}>Clear Filter</button>}
+      <div className="toolbar report-toolbar">
+        <label className="report-filter-label">From:</label>
+        <input type="date" className="search-input report-date-input" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
+        <label className="report-filter-label">To:</label>
+        <input type="date" className="search-input report-date-input" value={dateTo} onChange={e => setDateTo(e.target.value)} />
+        {(dateFrom || dateTo) && <button className="chip active report-clear-btn" onClick={() => { setDateFrom(''); setDateTo(''); }}>Clear Filter</button>}
       </div>
 
       {/* Summary Cards */}
@@ -138,8 +176,8 @@ export default function ReportsPage() {
       </div>
 
       {/* Intern Table */}
-      <div className="table-card">
-        <h3>OJT Hours Report</h3>
+      <div className="table-card report-card">
+        <h3 className="report-card-title">OJT Hours Report</h3>
         <table>
           <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Company</th><th>Required</th><th>Rendered</th><th>Remaining</th><th>Progress</th></tr></thead>
           <tbody>
@@ -161,7 +199,7 @@ export default function ReportsPage() {
               </tr>
             ))}
             {filteredData.length === 0 && !loading && (
-              <tr><td colSpan="8" style={{ textAlign: 'center', color: '#aaa', padding: 32 }}>No interns found</td></tr>
+              <tr><td colSpan="8" className="report-empty">No interns found</td></tr>
             )}
           </tbody>
         </table>
@@ -169,8 +207,8 @@ export default function ReportsPage() {
 
       {/* Per-Company Breakdown */}
       {companies.length > 0 && (
-        <div className="table-card" style={{ marginTop: 20 }}>
-          <h3>Per-Company Breakdown</h3>
+        <div className="table-card report-card report-breakdown-card">
+          <h3 className="report-card-title">Per-Company Breakdown</h3>
           <table>
             <thead><tr><th>Company</th><th>Interns</th><th>Total Rendered</th><th>Avg Rendered</th></tr></thead>
             <tbody>

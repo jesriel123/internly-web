@@ -311,11 +311,11 @@
 
 /* Links */
 .dark-mode a {
-  color: #a78bfa;
+  color: inherit;
 }
 
 .dark-mode a:hover {
-  color: #c4b5fd;
+  color: inherit;
 }
 
 /* Dividers */

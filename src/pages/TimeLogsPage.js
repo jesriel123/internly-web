@@ -378,7 +378,7 @@ export default function TimeLogsPage() {
       </div>
 
       {/* Company + search */}
-      <div className="toolbar">
+      <div className="toolbar timelogs-toolbar">
         <select
           className="company-select"
           value={selectedCompany}
@@ -410,8 +410,8 @@ export default function TimeLogsPage() {
       </div>
 
       {/* Logs table */}
-      <div className="table-card">
-        <h3>Daily Logs {selectedCompany ? `— ${selectedCompany}` : ""}</h3>
+      <div className="table-card timelogs-card">
+        <h3 className="timelogs-card-title">Daily Logs {selectedCompany ? `— ${selectedCompany}` : ""}</h3>
         <table>
           <thead>
             <tr>
@@ -446,14 +446,7 @@ export default function TimeLogsPage() {
                   </td>
                   <td>
                     {typeInfo && (
-                      <span
-                        className="badge"
-                        style={{
-                          background: typeInfo.bg,
-                          color: typeInfo.color,
-                          fontWeight: 700,
-                        }}
-                      >
+                      <span className={`badge tl-type tl-type-${detectedType}`}>
                         {typeInfo.label}
                       </span>
                     )}
@@ -536,10 +529,7 @@ export default function TimeLogsPage() {
             })}
             {visibleLogs.length === 0 && !logsLoading && (
               <tr>
-                <td
-                  colSpan="8"
-                  style={{ textAlign: "center", color: "#aaa", padding: 32 }}
-                >
+                <td colSpan="8" className="timelogs-empty-row">
                   {!selectedCompany
                     ? "Select a company to view daily logs"
                     : searchQuery

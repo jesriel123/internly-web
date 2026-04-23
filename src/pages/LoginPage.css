@@ -132,7 +132,7 @@ body, html {
 .brand-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 60px;
 }
 
@@ -148,9 +148,9 @@ body, html {
 }
 
 .logo-image {
-  width: 54px;
-  height: 54px;
-  border-radius: 12px;
+  width: 84px;
+  height: 84px;
+  border-radius: 16px;
   object-fit: cover;
   border: 1px solid rgba(99, 102, 241, 0.28);
   background-color: #ffffff;

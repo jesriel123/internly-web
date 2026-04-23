@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../supabaseConfig';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useAuth } from '../context/AuthContext';
@@ -120,12 +120,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [attendSearch, setAttendSearch] = useState('');
 
-  useEffect(() => {
-    if (!user?.role) return;
-    fetchData();
-  }, [user?.role, user?.company]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const adminCompany = String(user?.company || '').trim();
@@ -190,7 +185,12 @@ export default function DashboardPage() {
     } catch (err) {
       console.error('Dashboard fetch error:', err);
     } finally { setLoading(false); }
-  };
+  }, [user?.company, isSuperAdmin]);
+
+  useEffect(() => {
+    if (!user?.role) return;
+    fetchData();
+  }, [fetchData, user?.role]);
 
   const companyMap = {};
   companyRecords.forEach((c) => {
