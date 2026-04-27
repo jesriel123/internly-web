@@ -5,7 +5,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.99.1",
     "date-fns": "^4.1.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.4.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.577.0",
