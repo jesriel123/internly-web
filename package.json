@@ -9,7 +9,7 @@
     "dotenv": "^16.4.5",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.11.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^6.30.3",
