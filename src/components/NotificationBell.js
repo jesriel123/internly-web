@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../supabaseConfig';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './NotificationBell.css';
+
+const PH_TIMEZONE = 'Asia/Manila';
 
 export default function NotificationBell() {
   const { user } = useAuth();
@@ -12,50 +15,10 @@ export default function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showPanel, setShowPanel] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
   const panelRef = useRef(null);
 
-  useEffect(() => {
-    if (user?.uid) {
-      fetchNotifications();
-      
-      // Subscribe to realtime updates
-      const channel = supabase
-        .channel('notification-updates')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'notification_logs',
-            filter: `recipient_id=eq.${user.uid}`,
-          },
-          () => {
-            fetchNotifications();
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [user?.uid]);
-
-  // Close panel when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (panelRef.current && !panelRef.current.contains(event.target)) {
-        setShowPanel(false);
-      }
-    }
-
-    if (showPanel) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [showPanel]);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!user?.uid) return;
     
     setLoading(true);
@@ -105,7 +68,48 @@ export default function NotificationBell() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.uid]);
+
+  useEffect(() => {
+    if (user?.uid) {
+      fetchNotifications();
+      
+      // Subscribe to realtime updates
+      const channel = supabase
+        .channel('notification-updates')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'notification_logs',
+            filter: `recipient_id=eq.${user.uid}`,
+          },
+          () => {
+            fetchNotifications();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user?.uid, fetchNotifications]);
+
+  // Close panel when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (panelRef.current && !panelRef.current.contains(event.target)) {
+        setShowPanel(false);
+      }
+    }
+
+    if (showPanel) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showPanel]);
 
   const markAsRead = async (notificationLogId) => {
     try {
@@ -149,10 +153,11 @@ export default function NotificationBell() {
       markAsRead(notification.id);
     }
     setShowPanel(false);
-    // Navigate to relevant page based on notification type
-    if (notification.type === 'clock_in' || notification.type === 'clock_out') {
-      navigate('/time-logs');
-    }
+    setSelectedNotification(notification);
+  };
+
+  const closeNotificationDetails = () => {
+    setSelectedNotification(null);
   };
 
   const getNotificationIcon = (type) => {
@@ -223,6 +228,66 @@ export default function NotificationBell() {
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
     if (seconds < 604800) return `${Math.floor(seconds / 86400)}d`;
     return `${Math.floor(seconds / 604800)}w`;
+  };
+
+  const formatPHClockStamp = (dateString) => {
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    const time = date.toLocaleTimeString('en-US', {
+      timeZone: PH_TIMEZONE,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    const dateOnly = new Intl.DateTimeFormat('en-CA', {
+      timeZone: PH_TIMEZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+
+    return { time, dateOnly };
+  };
+
+  const formatNotificationMessage = (notif) => {
+    if (!(notif.type === 'clock_in' || notif.type === 'clock_out')) {
+      return notif.message;
+    }
+
+    const stamp = formatPHClockStamp(notif.createdAt);
+    if (!stamp) {
+      return notif.message;
+    }
+
+    const actorFromMessage = String(notif.message || '').split(/\s+clocked\s+/i)[0]?.trim();
+    const actor = actorFromMessage || notif.senderName || 'Student';
+
+    if (notif.type === 'clock_in') {
+      return `${actor} clocked in at ${stamp.time} on ${stamp.dateOnly}`;
+    }
+
+    const loggedSuffix = String(notif.message || '').match(/\([^)]*logged\)/i)?.[0] || '';
+    return `${actor} clocked out at ${stamp.time} on ${stamp.dateOnly}${loggedSuffix ? ` ${loggedSuffix}` : ''}`;
+  };
+
+  const formatDetailedTimestamp = (dateString) => {
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return '—';
+
+    return date.toLocaleString('en-US', {
+      timeZone: PH_TIMEZONE,
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    });
   };
 
   const visibleNotifications =
@@ -316,7 +381,7 @@ export default function NotificationBell() {
                   </div>
                   <div className="notification-content">
                     <div className="notification-title">{notif.title}</div>
-                    <div className="notification-message">{notif.message}</div>
+                    <div className="notification-message">{formatNotificationMessage(notif)}</div>
                     <div className="notification-time">{getTimeAgo(notif.createdAt)}</div>
                   </div>
                   {!notif.isRead && <div className="notification-dot"></div>}
@@ -331,6 +396,31 @@ export default function NotificationBell() {
             </button>
           </div>
         </div>
+      )}
+
+      {selectedNotification && createPortal(
+        <div className="notification-details-overlay" onClick={closeNotificationDetails}>
+          <div className="notification-details-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="notification-details-header">
+              <div className={`notification-icon-large ${getNotificationIconClass(selectedNotification.type)}`}>
+                {getNotificationIcon(selectedNotification.type)}
+              </div>
+              <div className="notification-header-text">
+                <h4>{selectedNotification.title || 'Notification'}</h4>
+                <span className="notification-date">{formatDetailedTimestamp(selectedNotification.createdAt)}</span>
+              </div>
+            </div>
+
+            <div className="notification-details-body">
+              <p className="notification-message-large">{formatNotificationMessage(selectedNotification)}</p>
+            </div>
+
+            <div className="notification-details-footer">
+              <button type="button" className="btn-close" onClick={closeNotificationDetails}>Close</button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -36,11 +36,6 @@ export default function TimeLogsPage() {
   const [loading, setLoading] = useState(true);
   const [logsLoading, setLogsLoading] = useState(false);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    fetchStudents();
-  }, []);
-
   const normalizeStudent = (row) => {
     const role = String(row?.role || "user").toLowerCase();
     if (role === "admin" || role === "super_admin") return null;
@@ -70,13 +65,27 @@ export default function TimeLogsPage() {
     };
   };
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: list, error } = await supabase
+      const isSuperAdmin = me?.role === "super_admin";
+      const adminCompany = String(me?.company || "").trim();
+
+      let usersQuery = supabase
         .from("users")
         .select("*")
         .limit(500);
+
+      if (!isSuperAdmin) {
+        if (!adminCompany) {
+          setStudents([]);
+          setLoading(false);
+          return;
+        }
+        usersQuery = usersQuery.eq("company", adminCompany);
+      }
+
+      const { data: list, error } = await usersQuery;
       if (error) throw error;
 
       const fromUsers = (list || [])
@@ -137,12 +146,31 @@ export default function TimeLogsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [me?.role, me?.company]);
+
+  useEffect(() => {
+    if (!me?.role) return;
+    fetchStudents();
+  }, [fetchStudents, me?.role, me?.company]);
+
+  useEffect(() => {
+    if (me?.role === "admin" && me?.company) {
+      setSelectedCompany(String(me.company).trim());
+    }
+  }, [me?.role, me?.company]);
 
   const fetchCompanyLogs = useCallback(
     async (companyName) => {
       const normalizedCompany = String(companyName || "").trim();
       if (!normalizedCompany) {
+        setLogs([]);
+        return;
+      }
+
+      if (
+        me?.role === "admin" &&
+        normalizedCompany !== String(me?.company || "").trim()
+      ) {
         setLogs([]);
         return;
       }
@@ -193,7 +221,7 @@ export default function TimeLogsPage() {
         setLogsLoading(false);
       }
     },
-    [students],
+    [students, me?.role, me?.company],
   );
 
   const handleCompanyChange = (companyName) => {
@@ -350,7 +378,7 @@ export default function TimeLogsPage() {
       </div>
 
       {/* Company + search */}
-      <div className="toolbar">
+      <div className="toolbar timelogs-toolbar">
         <select
           className="company-select"
           value={selectedCompany}
@@ -382,8 +410,8 @@ export default function TimeLogsPage() {
       </div>
 
       {/* Logs table */}
-      <div className="table-card">
-        <h3>Daily Logs {selectedCompany ? `— ${selectedCompany}` : ""}</h3>
+      <div className="table-card timelogs-card">
+        <h3 className="timelogs-card-title">Daily Logs {selectedCompany ? `— ${selectedCompany}` : ""}</h3>
         <table>
           <thead>
             <tr>
@@ -418,14 +446,7 @@ export default function TimeLogsPage() {
                   </td>
                   <td>
                     {typeInfo && (
-                      <span
-                        className="badge"
-                        style={{
-                          background: typeInfo.bg,
-                          color: typeInfo.color,
-                          fontWeight: 700,
-                        }}
-                      >
+                      <span className={`badge tl-type tl-type-${detectedType}`}>
                         {typeInfo.label}
                       </span>
                     )}
@@ -508,10 +529,7 @@ export default function TimeLogsPage() {
             })}
             {visibleLogs.length === 0 && !logsLoading && (
               <tr>
-                <td
-                  colSpan="8"
-                  style={{ textAlign: "center", color: "#aaa", padding: 32 }}
-                >
+                <td colSpan="8" className="timelogs-empty-row">
                   {!selectedCompany
                     ? "Select a company to view daily logs"
                     : searchQuery

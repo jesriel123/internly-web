@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../supabaseConfig';
 import { logButtonClick, logRequestStart, logRequestSuccess, logRequestFailure, logNetworkStatus } from '../utils/debugLogger';
-import { Mail, Lock, Eye, EyeOff, Shield, Calendar, CheckSquare, Users, Globe, GraduationCap } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield, Calendar, CheckSquare, Users } from 'lucide-react';
 import './LoginPage.css';
 
-const PASSWORD_RESET_PROD_URL = 'https://internly-web.vercel.app/reset-password';
+const TITAN_LOGO_URL = '/titan-logo.png';
+
+const PASSWORD_RESET_PROD_URL = 'https://internll-projects.vercel.app/reset-password';
 
 function sanitizeHttpRedirectUrl(rawValue, fallback) {
   const cleaned = String(rawValue || '').trim();
@@ -35,70 +36,6 @@ function friendlyError(err) {
     return 'Invalid email or password.';
   }
   return err?.message || 'Login failed. Please try again.';
-}
-
-function classifyLog(hours, dailyMax) {
-  if (hours == null) return 'absent';
-  const h = Number(hours);
-  if (h >= dailyMax) return 'present';
-  if (h >= dailyMax / 2) return 'earlyOut';
-  return 'halfDay';
-}
-
-function computeAttendance(logs, startDate, dailyMax) {
-  const logMap = {};
-  logs.forEach((l) => {
-    logMap[l.date] = l;
-  });
-
-  let present = 0;
-  let absent = 0;
-  let halfDay = 0;
-  let earlyOut = 0;
-
-  if (startDate) {
-    const start = new Date(startDate + (String(startDate).includes('T') ? '' : 'T00:00:00'));
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(23, 59, 59, 999);
-
-    const d = new Date(start);
-    while (d <= yesterday) {
-      const day = d.getDay();
-      if (day !== 0 && day !== 6) {
-        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        const log = logMap[key];
-        if (!log || log.status === 'rejected') {
-          absent += 1;
-        } else {
-          const type = classifyLog(log.status === 'approved' ? log.hours : null, dailyMax);
-          if (type === 'present') present += 1;
-          else if (type === 'halfDay') halfDay += 1;
-          else if (type === 'earlyOut') earlyOut += 1;
-          else absent += 1;
-        }
-      }
-      d.setDate(d.getDate() + 1);
-    }
-  } else {
-    logs.forEach((l) => {
-      if (l.status === 'approved') {
-        const type = classifyLog(l.hours, dailyMax);
-        if (type === 'present') present += 1;
-        else if (type === 'halfDay') halfDay += 1;
-        else if (type === 'earlyOut') earlyOut += 1;
-      }
-    });
-  }
-
-  return { present, absent, halfDay, earlyOut };
-}
-
-function computeAttendanceRate(totals) {
-  const totalDays = totals.present + totals.absent + totals.halfDay + totals.earlyOut;
-  if (totalDays === 0) return 0;
-  const weightedPresent = totals.present + (totals.earlyOut * 0.75) + (totals.halfDay * 0.5);
-  return Math.min(100, (weightedPresent / totalDays) * 100);
 }
 
 export default function LoginPage() {
@@ -167,8 +104,8 @@ export default function LoginPage() {
       <div className="login-left">
         <div className="left-content">
           <div className="brand-logo">
-            <div className="logo-icon"><GraduationCap size={24} color="#FFFFFF" /></div>
-            <h2>Internly</h2>
+            <img src={TITAN_LOGO_URL} alt="Titan logo" className="logo-image" />
+            <h2>Titan</h2>
           </div>
           
           <h1 className="hero-text">

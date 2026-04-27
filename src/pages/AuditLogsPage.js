@@ -96,7 +96,7 @@ export default function AuditLogsPage() {
         <div>
           {loading ? (
             <div className="live-status live-blue">
-              <span className="live-dot" style={{ animation: 'none' }}></span> Loading...
+              <span className="live-dot live-dot-static"></span> Loading...
             </div>
           ) : (
             <div className="live-status live-green">

@@ -1,23 +1,385 @@
-.timelogs-page .page-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-.timelogs-page .toolbar{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap}
-.company-select{padding:10px 16px;border-radius:10px;border:1.5px solid rgba(124,58,237,.35);font-size:14px;min-width:220px;transition:border .2s;background:rgba(15,23,42,.72);color:#E5E7EB}
-.company-select:focus{border-color:#7B68EE;outline:none}
-.student-search{padding:10px 16px;border-radius:10px;border:1.5px solid rgba(124,58,237,.25);font-size:14px;min-width:260px;transition:border .2s;background:rgba(15,23,42,.72);color:#E5E7EB}
-.student-search:focus{border-color:#7B68EE;outline:none}
-.student-search::placeholder{color:#9CA3AF;opacity:.9}
-.student-search:disabled{background:rgba(15,23,42,.45);color:#9CA3AF;cursor:not-allowed}
-.company-summary{display:flex;align-items:center;padding:9px 12px;border-radius:10px;background:rgba(124,58,237,.14);border:1px solid rgba(124,58,237,.35);font-size:13px;font-weight:700;color:#C4B5FD}
-.badge.status-approved{background:#E8F5E9;color:#2E7D32}
-.badge.status-pending{background:#FFF8E1;color:#F57C00}
-.badge.status-rejected{background:#FFEBEE;color:#D32F2F}
-.badge.status-flagged{background:#FFF3E0;color:#E65100}
+.timelogs-page .timelogs-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
 
-.action-btn.approve-present{background:#EDE9FE;color:#7C3AED;border:none;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
-.action-btn.approve-ot{background:#D1FAE5;color:#059669;border:none;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
-.action-btn.approve-early{background:#DBEAFE;color:#2563EB;border:none;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
-.action-btn.approve-half{background:#FEF3C7;color:#D97706;border:none;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
-.action-btn.approve-present:hover{background:#DDD6FE}
-.action-btn.approve-ot:hover{background:#A7F3D0}
-.action-btn.approve-early:hover{background:#BFDBFE}
-.action-btn.approve-half:hover{background:#FDE68A}
-.td-actions{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.timelogs-page .company-select,
+.timelogs-page .student-search {
+  min-height: 38px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  font-size: 14px;
+  transition: border 0.2s, box-shadow 0.2s;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.timelogs-page .company-select {
+  min-width: 220px;
+}
+
+.timelogs-page .student-search {
+  min-width: 260px;
+}
+
+.timelogs-page .company-select:focus,
+.timelogs-page .student-search:focus {
+  border-color: #6366f1;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.timelogs-page .student-search::placeholder {
+  color: #94a3b8;
+}
+
+.timelogs-page .student-search:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.timelogs-page .company-summary {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #3730a3;
+}
+
+.timelogs-page .timelogs-card {
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 18px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  overflow: auto;
+}
+
+.timelogs-page .timelogs-card-title {
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.timelogs-page .timelogs-card table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.timelogs-page .timelogs-card thead th {
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 11px;
+  font-weight: 800;
+  color: #1e3a8a;
+  text-align: left;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #eff6ff;
+}
+
+.timelogs-page .timelogs-card td {
+  padding: 11px 10px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.timelogs-page .timelogs-card tbody tr:hover {
+  background: #f8fafc;
+}
+
+.timelogs-page .td-name {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.timelogs-page .td-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.timelogs-page .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.timelogs-page .tl-type {
+  border: 1px solid transparent;
+}
+
+.timelogs-page .tl-type-present {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+  color: #3730a3;
+}
+
+.timelogs-page .tl-type-overtime {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.timelogs-page .tl-type-earlyOut {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e3a8a;
+}
+
+.timelogs-page .tl-type-halfDay {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
+.timelogs-page .badge.status-approved {
+  background: #e0e7ff;
+  border: 1px solid #a5b4fc;
+  color: #3730a3;
+}
+
+.timelogs-page .badge.status-pending {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+}
+
+.timelogs-page .badge.status-rejected,
+.timelogs-page .badge.status-flagged {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+.timelogs-page .action-btn {
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: #f8fafc;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timelogs-page .action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14);
+}
+
+.timelogs-page .action-btn.approve-present {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+  color: #3730a3;
+}
+
+.timelogs-page .action-btn.approve-ot {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.timelogs-page .action-btn.approve-early {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e3a8a;
+}
+
+.timelogs-page .action-btn.approve-half,
+.timelogs-page .action-btn.warn {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
+.timelogs-page .action-btn.danger {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.timelogs-page .timelogs-empty-row {
+  text-align: center;
+  color: #64748b;
+  padding: 32px;
+}
+
+.dark-mode .timelogs-page .timelogs-toolbar,
+.dark-mode .timelogs-page .timelogs-card {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.92));
+  box-shadow: 0 18px 34px rgba(2, 8, 20, 0.24);
+}
+
+.dark-mode .timelogs-page .timelogs-toolbar {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.84), rgba(15, 23, 42, 0.72));
+}
+
+.dark-mode .timelogs-page .company-select,
+.dark-mode .timelogs-page .student-search {
+  background: rgba(15, 23, 42, 0.65);
+  color: #f1f5f9;
+}
+
+.dark-mode .timelogs-page .student-search:disabled {
+  background: rgba(15, 23, 42, 0.45);
+  color: #9ca3af;
+}
+
+.dark-mode .timelogs-page .company-summary {
+  background: rgba(99, 102, 241, 0.16);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #c7d2fe;
+}
+
+.dark-mode .timelogs-page .timelogs-card-title,
+.dark-mode .timelogs-page .timelogs-card td,
+.dark-mode .timelogs-page .td-name {
+  color: #e2e8f0;
+}
+
+.dark-mode .timelogs-page .timelogs-card thead th {
+  color: #93c5fd;
+  background: rgba(15, 23, 42, 0.7);
+}
+
+.dark-mode .timelogs-page .timelogs-card td {
+  border-bottom-color: rgba(51, 65, 85, 0.85);
+}
+
+.dark-mode .timelogs-page .timelogs-card tbody tr:hover {
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.dark-mode .timelogs-page .tl-type-present {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.45);
+  color: #c7d2fe;
+}
+
+.dark-mode .timelogs-page .tl-type-overtime {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #86efac;
+}
+
+.dark-mode .timelogs-page .tl-type-earlyOut {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #7dd3fc;
+}
+
+.dark-mode .timelogs-page .tl-type-halfDay {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+
+.dark-mode .timelogs-page .badge.status-approved {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.45);
+  color: #c7d2fe;
+}
+
+.dark-mode .timelogs-page .badge.status-pending {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+
+.dark-mode .timelogs-page .badge.status-rejected,
+.dark-mode .timelogs-page .badge.status-flagged {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fda4af;
+}
+
+.dark-mode .timelogs-page .action-btn {
+  background: rgba(148, 163, 184, 0.1);
+  color: #cbd5e1;
+}
+
+.dark-mode .timelogs-page .action-btn.approve-present {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.45);
+  color: #dbeafe;
+}
+
+.dark-mode .timelogs-page .action-btn.approve-ot {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #86efac;
+}
+
+.dark-mode .timelogs-page .action-btn.approve-early {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #7dd3fc;
+}
+
+.dark-mode .timelogs-page .action-btn.approve-half,
+.dark-mode .timelogs-page .action-btn.warn {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+
+.dark-mode .timelogs-page .action-btn.danger {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fda4af;
+}
+
+.dark-mode .timelogs-page .timelogs-empty-row {
+  color: #94a3b8;
+}
+
+@media (max-width: 900px) {
+  .timelogs-page .timelogs-toolbar {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .timelogs-page .company-select,
+  .timelogs-page .student-search {
+    width: 100%;
+    min-width: 180px;
+  }
+
+  .timelogs-page .timelogs-card {
+    padding: 12px;
+  }
+}

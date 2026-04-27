@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '../supabaseConfig';
 import { useAuth } from '../context/AuthContext';
 import { logButtonClick, logRequestStart, logRequestSuccess, logRequestFailure } from '../utils/debugLogger';
@@ -62,15 +62,31 @@ export default function UsersPage() {
   const [saving, setSaving] = useState(false);
   const presetIntentRef = useRef({});
 
-  useEffect(() => { fetchUsers(); }, []);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     const start = logRequestStart('FETCH_ALL_USERS');
     setLoading(true);
     try {
+      const isSuperAdmin = me?.role === 'super_admin';
+      const adminCompany = String(me?.company || '').trim();
+
+      let usersQuery = supabase.from('users').select('*').limit(200);
+      let companiesQuery = supabase.from('companies').select('name,address').limit(200);
+
+      if (!isSuperAdmin) {
+        if (!adminCompany) {
+          setUsers([]);
+          setCompanies([]);
+          setSetupDrafts({});
+          setLoading(false);
+          return;
+        }
+        usersQuery = usersQuery.eq('company', adminCompany);
+        companiesQuery = companiesQuery.eq('name', adminCompany);
+      }
+
       const [{ data: usersData, error: usersError }, { data: companiesData, error: companiesError }] = await Promise.all([
-        supabase.from('users').select('*').limit(200),
-        supabase.from('companies').select('name,address').limit(200),
+        usersQuery,
+        companiesQuery,
       ]);
       if (usersError) throw usersError;
       if (companiesError) throw companiesError;
@@ -85,7 +101,12 @@ export default function UsersPage() {
     } catch (err) {
       logRequestFailure('FETCH_ALL_USERS', start, err);
     } finally { setLoading(false); }
-  };
+  }, [me?.role, me?.company]);
+
+  useEffect(() => {
+    if (!me?.role) return;
+    fetchUsers();
+  }, [fetchUsers, me?.role]);
 
   const changeRole = async (uid, newRole) => {
     logButtonClick(`CHANGE_ROLE_${newRole}_${uid}`);
@@ -394,13 +415,14 @@ export default function UsersPage() {
                       <select
                         className="setup-preset"
                         defaultValue=""
+                        aria-label="Required hours presets"
                         onMouseDown={() => markPresetIntent(u.id, 'requiredHours')}
                         onChange={e => {
                           applySetupPreset(u.id, 'requiredHours', e.target.value);
                           e.target.value = '';
                         }}
                       >
-                        <option value="">▼</option>
+                        <option value="" disabled hidden>▼</option>
                         <option value="486">486</option>
                         <option value="600">600</option>
                       </select>
@@ -430,13 +452,14 @@ export default function UsersPage() {
                       <select
                         className="setup-preset"
                         defaultValue=""
+                        aria-label="Daily max hours presets"
                         onMouseDown={() => markPresetIntent(u.id, 'dailyMaxHours')}
                         onChange={e => {
                           applySetupPreset(u.id, 'dailyMaxHours', e.target.value);
                           e.target.value = '';
                         }}
                       >
-                        <option value="">▼</option>
+                        <option value="" disabled hidden>▼</option>
                         <option value="8">8</option>
                         <option value="9">9</option>
                       </select>

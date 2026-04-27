@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../supabaseConfig';
 import { useAuth } from '../context/AuthContext';
 import { logButtonClick, logRequestStart, logRequestSuccess, logRequestFailure } from '../utils/debugLogger';
@@ -21,22 +21,38 @@ export default function NotificationsPage() {
     targetRole: 'user',
   });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const start = logRequestStart('NOTIF_FETCH');
     setLoading(true);
     try {
+      const isSuperAdmin = me?.role === 'super_admin';
+      const adminCompany = String(me?.company || '').trim();
+
+      let companiesQuery = supabase.from('companies').select('name').limit(100);
+      let usersQuery = supabase.from('users').select('*').limit(200);
+      let notificationsQuery = supabase
+        .from('notifications')
+        .select('*, sender:sender_id(name, email, company)')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (!isSuperAdmin) {
+        if (!adminCompany) {
+          setCompanies([]);
+          setUsers([]);
+          setNotifications([]);
+          setLoading(false);
+          return;
+        }
+        companiesQuery = companiesQuery.eq('name', adminCompany);
+        usersQuery = usersQuery.eq('company', adminCompany);
+        notificationsQuery = notificationsQuery.or(`target_company.eq.${adminCompany},is_global.eq.true,sender_id.eq.${me.uid}`);
+      }
+
       const [{ data: companyList }, { data: userList }, { data: notifList }] = await Promise.all([
-        supabase.from('companies').select('name').limit(100),
-        supabase.from('users').select('*').limit(200),
-        supabase
-          .from('notifications')
-          .select('*, sender:sender_id(name, email, company)')
-          .order('created_at', { ascending: false })
-          .limit(50),
+        companiesQuery,
+        usersQuery,
+        notificationsQuery,
       ]);
 
       setCompanies(companyList || []);
@@ -48,7 +64,17 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [me?.role, me?.company, me?.uid]);
+
+  useEffect(() => {
+    if (!me?.role) return;
+    fetchData();
+    setForm(prev => ({
+      ...prev,
+      targetScope: me?.role === 'super_admin' ? 'all' : 'my-company',
+      targetCompany: me?.company || '',
+    }));
+  }, [fetchData, me?.role, me?.company]);
 
   const getTargetUsers = () => {
     let targets = users;
@@ -179,7 +205,7 @@ export default function NotificationsPage() {
           <h1>Send Notifications</h1>
           <p>Send messages to interns and staff</p>
         </div>
-        <div>
+        <div className="notifications-actions">
           <button className="btn-primary notif-refresh-btn" onClick={fetchData} disabled={loading}>
             {loading ? 'Loading…' : 'Refresh'}
           </button>
@@ -279,12 +305,12 @@ export default function NotificationsPage() {
 
       {/* Notification History */}
       <div className="history-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <div className="history-head">
           <h3>Recent Notifications</h3>
           <select 
             value={filterType} 
             onChange={e => setFilterType(e.target.value)}
-            style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #ddd' }}
+            className="history-filter-select"
           >
             <option value="all">All Notifications</option>
             <option value="manual">Manual (Admin Sent)</option>
@@ -330,14 +356,7 @@ export default function NotificationsPage() {
                 return (
                   <tr key={notif.id}>
                     <td>
-                      <span style={{ 
-                        padding: '4px 8px', 
-                        borderRadius: 6, 
-                        fontSize: 11, 
-                        fontWeight: 700,
-                        backgroundColor: typeInfo.bg,
-                        color: typeInfo.color
-                      }}>
+                      <span className={`notif-type-badge notif-type-${notif.notification_type || 'manual'}`}>
                         {typeInfo.label}
                       </span>
                     </td>
@@ -352,7 +371,7 @@ export default function NotificationsPage() {
               })}
               {notifications.filter(notif => filterType === 'all' || notif.notification_type === filterType).length === 0 && !loading && (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', color: '#aaa', padding: 24 }}>
+                  <td colSpan="7" className="notifications-empty-row">
                     No notifications found
                   </td>
                 </tr>

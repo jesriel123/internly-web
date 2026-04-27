@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../supabaseConfig';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useAuth } from '../context/AuthContext';
@@ -120,15 +120,30 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [attendSearch, setAttendSearch] = useState('');
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fetchData(); }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
+      const adminCompany = String(user?.company || '').trim();
+
+      let usersQuery = supabase.from('users').select('*').limit(200);
+      let companiesQuery = supabase.from('companies').select('name').limit(200);
+
+      if (!isSuperAdmin) {
+        if (!adminCompany) {
+          setUsers([]);
+          setCompanyRecords([]);
+          setInternStats([]);
+          setStats({ totalUsers: 0, admins: 0, companies: 0, activeInterns: 0 });
+          setLoading(false);
+          return;
+        }
+        usersQuery = usersQuery.eq('company', adminCompany);
+        companiesQuery = companiesQuery.eq('name', adminCompany);
+      }
+
       const [{ data: list, error: usersError }, { data: companyList, error: companiesError }] = await Promise.all([
-        supabase.from('users').select('*').limit(200),
-        supabase.from('companies').select('name').limit(200),
+        usersQuery,
+        companiesQuery,
       ]);
       if (usersError) throw usersError;
       if (companiesError) throw companiesError;
@@ -143,8 +158,7 @@ export default function DashboardPage() {
         ? recordCompanyNames.length
         : assignedCompanyNames.length;
 
-      let interns = (list || []).filter(u => u.role === 'user' || !u.role);
-      if (!isSuperAdmin && user?.company) interns = interns.filter(u => u.company === user.company);
+      const interns = (list || []).filter(u => u.role === 'user' || !u.role);
       setStats({ totalUsers: (list || []).length, admins, companies, activeInterns: interns.length });
 
       const internData = await Promise.all(interns.map(async (intern) => {
@@ -171,7 +185,12 @@ export default function DashboardPage() {
     } catch (err) {
       console.error('Dashboard fetch error:', err);
     } finally { setLoading(false); }
-  };
+  }, [user?.company, isSuperAdmin]);
+
+  useEffect(() => {
+    if (!user?.role) return;
+    fetchData();
+  }, [fetchData, user?.role]);
 
   const companyMap = {};
   companyRecords.forEach((c) => {

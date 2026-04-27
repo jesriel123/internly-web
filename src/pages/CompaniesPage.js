@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '../supabaseConfig';
 import { useAuth } from '../context/AuthContext';
@@ -31,15 +31,30 @@ export default function CompaniesPage() {
   const [adminForm, setAdminForm] = useState(getEmptyAdminForm());
   const [assigningAdmin, setAssigningAdmin] = useState(false);
 
-  useEffect(() => { fetchAll(); }, []);
-
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     const start = logRequestStart('COMPANIES_FETCH');
     setLoading(true);
     try {
+      const isSuperAdmin = me?.role === 'super_admin';
+      const adminCompany = String(me?.company || '').trim();
+
+      let companiesQuery = supabase.from('companies').select('*').limit(100);
+      let usersQuery = supabase.from('users').select('*').limit(200);
+
+      if (!isSuperAdmin) {
+        if (!adminCompany) {
+          setCompanies([]);
+          setUsers([]);
+          setLoading(false);
+          return;
+        }
+        companiesQuery = companiesQuery.eq('name', adminCompany);
+        usersQuery = usersQuery.eq('company', adminCompany);
+      }
+
       const [{ data: companies, error: compError }, { data: users, error: usersError }] = await Promise.all([
-        supabase.from('companies').select('*').limit(100),
-        supabase.from('users').select('*').limit(200),
+        companiesQuery,
+        usersQuery,
       ]);
       if (compError) throw compError;
       if (usersError) throw usersError;
@@ -49,7 +64,12 @@ export default function CompaniesPage() {
     } catch (err) {
       logRequestFailure('COMPANIES_FETCH', start, err);
     } finally { setLoading(false); }
-  };
+  }, [me?.role, me?.company]);
+
+  useEffect(() => {
+    if (!me?.role) return;
+    fetchAll();
+  }, [fetchAll, me?.role]);
 
   const addCompany = async (e) => {
     e.preventDefault();
@@ -274,7 +294,7 @@ export default function CompaniesPage() {
           <h1>Companies & OJT Hours</h1>
           <p>Manage company records and intern placements</p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className="companies-actions">
           <button className="btn-primary" onClick={() => { logButtonClick('REFRESH_COMPANIES'); fetchAll(); }} disabled={loading}>Refresh</button>
           {me?.role === 'super_admin' && (
             <button className="btn-primary" onClick={() => setShowAdd(!showAdd)}>
@@ -296,7 +316,7 @@ export default function CompaniesPage() {
       {/* Live stats from users */}
       <div className="stats-grid">
         {companyStatsEntries.map(([name, s]) => (
-          <div key={name} className="stat-card" onClick={() => setSelectedCompany(name)} style={{ cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }}>
+          <div key={name} className="stat-card clickable" onClick={() => setSelectedCompany(name)}>
             <div className="stat-icon"><IconBuilding /></div>
             <div>
               <strong>{name}</strong>
@@ -310,7 +330,7 @@ export default function CompaniesPage() {
       </div>
 
       {/* Firestore companies collection */}
-      <div className="table-card">
+      <div className="table-card companies-card">
         <h3>Company Records</h3>
         <table>
           <thead><tr><th>Name</th><th>Required Hours</th><th>Address</th><th>Actions</th></tr></thead>
@@ -332,7 +352,7 @@ export default function CompaniesPage() {
               </tr>
             ))}
             {companies.length === 0 && !loading && (
-              <tr><td colSpan="4" style={{ textAlign: 'center', color: '#aaa', padding: 24 }}>No companies added yet. Click "+ Add Company" above.</td></tr>
+              <tr><td colSpan="4" className="companies-empty-row">No companies added yet. Click "+ Add Company" above.</td></tr>
             )}
           </tbody>
         </table>

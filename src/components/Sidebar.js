@@ -118,21 +118,6 @@ const IcoAuditLogs = () => (
     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
   </svg>
 );
-const IcoLogo = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#fff"
-    strokeWidth="1.8"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    width="22"
-    height="22"
-  >
-    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-    <path d="M6 12v5c3.33 2 8.67 2 12 0v-5" />
-  </svg>
-);
 const IcoSignOut = () => (
   <svg
     viewBox="0 0 24 24"
@@ -192,10 +177,10 @@ export default function Sidebar() {
     <aside className="sidebar">
       <div className="sb-brand">
         <span className="sb-logo">
-          <IcoLogo />
+          <img src="/titan-logo.png" alt="Titan logo" />
         </span>
         <div>
-          <h2>Internly</h2>
+          <h2>Titan</h2>
           <small>Admin Panel</small>
         </div>
       </div>

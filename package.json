@@ -5,6 +5,9 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.99.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^16.4.5",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -12,11 +15,20 @@
     "react-scripts": "5.0.1",
     "recharts": "^3.8.0"
   },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.3.3"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "setup": "bash scripts/setup-dev.sh",
+    "migrate": "node scripts/migrate.js",
+    "type-check": "tsc --noEmit"
   },
   "eslintConfig": {
     "extends": "react-app"
