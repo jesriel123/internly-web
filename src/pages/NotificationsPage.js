@@ -197,6 +197,16 @@ export default function NotificationsPage() {
 
   const targetUsers = getTargetUsers();
   const companyOptions = companies.map(c => c.name).filter(Boolean);
+  const scopeLabel =
+    form.targetScope === 'all'
+      ? 'Global audience'
+      : form.targetScope === 'specific-company'
+      ? form.targetCompany
+        ? `Company: ${form.targetCompany}`
+        : 'Specific company'
+      : `My company: ${me?.company || 'Not set'}`;
+  const roleLabel =
+    form.targetRole === 'all' ? 'All roles' : form.targetRole === 'admin' ? 'Admins only' : 'Interns only';
 
   return (
     <div className="notifications-page">
@@ -214,7 +224,17 @@ export default function NotificationsPage() {
 
       {/* Send Form */}
       <div className="form-card">
-        <h3>Compose Message</h3>
+        <div className="compose-head">
+          <div className="compose-title-block">
+            <h3>Compose Message</h3>
+            <p>Write a clear update and choose exactly who should receive it.</p>
+          </div>
+          <div className="compose-meta" aria-live="polite">
+            <span className="meta-pill recipients-pill">{targetUsers.length} recipients</span>
+            <span className="meta-pill">{scopeLabel}</span>
+            <span className="meta-pill">{roleLabel}</span>
+          </div>
+        </div>
         <form onSubmit={sendNotification}>
           <div className="form-row">
             <div className="form-group">
@@ -226,7 +246,7 @@ export default function NotificationsPage() {
                 placeholder="e.g., Shift Change Notice"
                 maxLength="100"
               />
-              <small>{form.title.length}/100</small>
+              <small className={`char-counter ${form.title.length > 80 ? 'near-limit' : ''}`}>{form.title.length}/100</small>
             </div>
           </div>
 
@@ -240,7 +260,7 @@ export default function NotificationsPage() {
                 rows={4}
                 maxLength="500"
               />
-              <small>{form.message.length}/500</small>
+              <small className={`char-counter ${form.message.length > 420 ? 'near-limit' : ''}`}>{form.message.length}/500</small>
             </div>
           </div>
 

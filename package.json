@@ -5,6 +5,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.99.1",
     "date-fns": "^4.1.0",
+    "dompurify": "^3.4.1",
     "dotenv": "^16.4.5",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
@@ -19,11 +20,12 @@
     "@types/node": "^20.11.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.3.3"
+    "cross-env": "^7.0.3",
+    "typescript": "^4.9.5"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "cross-env GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "setup": "bash scripts/setup-dev.sh",

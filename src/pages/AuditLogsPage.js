@@ -203,9 +203,6 @@ export default function AuditLogsPage() {
                 <span className="detail-value">{selectedLog.details || 'No additional details'}</span>
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="btn-secondary" onClick={closeActionModal}>Close</button>
-            </div>
           </div>
         </div>
       )}
@@ -238,9 +235,6 @@ export default function AuditLogsPage() {
                   {fmt(logTime(logs.find(l => l.user_name === selectedUserName || l.user_id === selectedUserName)))}
                 </span>
               </div>
-            </div>
-            <div className="modal-footer">
-              <button className="btn-secondary" onClick={closeUserProfile}>Close</button>
             </div>
           </div>
         </div>

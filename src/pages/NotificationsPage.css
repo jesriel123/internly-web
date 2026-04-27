@@ -1,3 +1,8 @@
+.notifications-page {
+  display: grid;
+  gap: 18px;
+}
+
 .notifications-page .notifications-actions {
   display: flex;
   gap: 10px;
@@ -11,24 +16,78 @@
 .notifications-page .form-card,
 .notifications-page .history-card {
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 18px;
+  border-radius: 18px;
+  padding: 20px;
   background: #ffffff;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
 }
 
 .notifications-page .form-card {
   margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.notifications-page .form-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4f46e5, #6366f1, #38bdf8);
 }
 
 .notifications-page .form-card h3,
 .notifications-page .history-card h3 {
-  margin: 0 0 12px;
-  font-size: 15px;
+  margin: 0;
+  font-size: 18px;
   font-weight: 800;
   color: #0f172a;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.notifications-page .compose-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 14px;
+}
+
+.notifications-page .compose-title-block {
+  display: grid;
+  gap: 6px;
+}
+
+.notifications-page .compose-title-block p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.notifications-page .compose-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.notifications-page .meta-pill {
+  min-height: 30px;
+  padding: 6px 11px;
+  border: 1px solid #dbe4ff;
+  border-radius: 999px;
+  background: #f8faff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+}
+
+.notifications-page .recipients-pill {
+  color: #3730a3;
+  border-color: #c7d2fe;
+  background: #eef2ff;
 }
 
 .notifications-page form {
@@ -53,6 +112,7 @@
   flex-direction: column;
   gap: 6px;
   flex: 1;
+  min-width: 0;
 }
 
 .notifications-page .form-group label {
@@ -67,13 +127,13 @@
 .notifications-page .form-group textarea,
 .notifications-page .form-group select,
 .notifications-page .history-filter-select {
-  min-height: 38px;
+  min-height: 40px;
   padding: 10px 12px;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 14px;
   font-family: inherit;
-  transition: border 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
   background: #ffffff;
   color: #0f172a;
 }
@@ -89,37 +149,55 @@
 .notifications-page .history-filter-select:focus {
   outline: none;
   border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
 }
 
-.notifications-page .form-group small {
+.notifications-page .form-group .char-counter {
   margin-top: 2px;
   color: #64748b;
   font-size: 12px;
+  font-weight: 600;
+}
+
+.notifications-page .form-group .char-counter.near-limit {
+  color: #b45309;
 }
 
 .notifications-page .form-section {
-  border-top: 1px solid #e2e8f0;
-  padding-top: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px;
+  background: #fafcff;
 }
 
 .notifications-page .form-section h4 {
   margin: 0 0 12px;
   font-size: 13px;
   font-weight: 800;
-  color: #1d4ed8;
+  color: #334155;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .notifications-page .form-actions {
   display: flex;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .notifications-page .btn-send {
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
+  box-shadow: 0 10px 20px rgba(79, 70, 229, 0.22);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.notifications-page .btn-send:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(79, 70, 229, 0.26);
 }
 
 .notifications-page .history-head {
@@ -234,9 +312,29 @@
   box-shadow: 0 18px 34px rgba(2, 8, 20, 0.24);
 }
 
+.dark-mode .notifications-page .form-card::before {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #38bdf8);
+}
+
 .dark-mode .notifications-page .form-card h3,
 .dark-mode .notifications-page .history-card h3 {
   color: #e2e8f0;
+}
+
+.dark-mode .notifications-page .compose-title-block p {
+  color: #94a3b8;
+}
+
+.dark-mode .notifications-page .meta-pill {
+  background: rgba(15, 23, 42, 0.58);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #cbd5e1;
+}
+
+.dark-mode .notifications-page .recipients-pill {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(129, 140, 248, 0.45);
+  color: #c7d2fe;
 }
 
 .dark-mode .notifications-page .form-group label {
@@ -257,12 +355,17 @@
   color: #94a3b8;
 }
 
+.dark-mode .notifications-page .form-group .char-counter.near-limit {
+  color: #fbbf24;
+}
+
 .dark-mode .notifications-page .form-section {
-  border-top-color: rgba(51, 65, 85, 0.85);
+  border-color: rgba(51, 65, 85, 0.85);
+  background: rgba(15, 23, 42, 0.45);
 }
 
 .dark-mode .notifications-page .form-section h4 {
-  color: #bfdbfe;
+  color: #cbd5e1;
 }
 
 .dark-mode .notifications-page .table-card thead th {
@@ -322,6 +425,14 @@
   .notifications-page .form-card,
   .notifications-page .history-card {
     padding: 12px;
+  }
+
+  .notifications-page .compose-head {
+    flex-direction: column;
+  }
+
+  .notifications-page .compose-meta {
+    justify-content: flex-start;
   }
 
   .notifications-page .history-filter-select {
