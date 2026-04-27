@@ -6,7 +6,7 @@ import './LoginPage.css';
 
 const TITAN_LOGO_URL = '/titan-logo.png';
 
-const PASSWORD_RESET_PROD_URL = 'https://internly-web.vercel.app/reset-password';
+const PASSWORD_RESET_PROD_URL = 'https://internll-projects.vercel.app/reset-password';
 
 function sanitizeHttpRedirectUrl(rawValue, fallback) {
   const cleaned = String(rawValue || '').trim();

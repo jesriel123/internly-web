@@ -6,7 +6,7 @@ import { logAuthEvent } from "../utils/debugLogger";
 const AuthContext = createContext(null);
 const AUTH_TIMEOUT_MS = 12000;
 const PASSWORD_RESET_PROD_URL =
-  "https://internly-web.vercel.app/reset-password";
+  "https://internll-projects.vercel.app/reset-password";
 
 function sanitizeHttpRedirectUrl(rawValue, fallback) {
   const cleaned = String(rawValue || "").trim();
